@@ -1,9 +1,11 @@
-@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap");
+/* index.css — shared styles for error/credits pages.
+   Colors use M3 CSS variables set by theme.js. */
 
 body {
-	font-family: "Roboto", Arial, Helvetica, sans-serif;
+	font-family: 'Inter', system-ui, -apple-system, sans-serif;
 	margin: 0;
-	background: #111;
+	background: var(--bg);
+	color: var(--on-surface);
 	display: flex;
 	flex-direction: column;
 	min-height: 100vh;
@@ -21,7 +23,7 @@ body {
 }
 
 .left-margin {
-	margin: 0px 16px;
+	margin: 0 16px;
 }
 
 #sj-frame {
@@ -31,18 +33,18 @@ body {
 	left: 0;
 	width: 100vw;
 	height: 100vh;
-	background-color: #111;
+	background: var(--bg);
 }
 
 #sj-error {
-	color: #ff6666 !important;
+	color: #ef4444 !important;
 	white-space: pre-wrap;
 }
 
 #sj-error-code {
 	font-size: 12px;
-	color: #fff;
-	font-family: "Courier New", Courier, monospace;
+	color: var(--on-surface-var);
+	font-family: 'Courier New', Courier, monospace;
 }
 
 .logo {
@@ -50,12 +52,14 @@ body {
 }
 
 .logo-wrapper .text {
-	font-size: 75px;
-	color: #fff;
+	font-size: 64px;
+	font-weight: 900;
+	letter-spacing: -0.03em;
+	color: var(--on-surface);
 }
 
 .logo-wrapper h1 {
-	color: white;
+	color: var(--on-surface);
 }
 
 footer {
@@ -79,8 +83,9 @@ footer a,
 footer span {
 	margin: 0 15px;
 	text-decoration: none;
-	color: #fff;
-	font-size: 15px;
+	color: var(--on-surface-var);
+	font-size: 14px;
+	font-weight: 500;
 }
 
 footer a {
@@ -88,44 +93,43 @@ footer a {
 }
 
 footer a:hover {
-	text-decoration: underline;
+	color: var(--accent);
 }
 
 .desc p {
 	width: 560px;
-	color: rgba(253, 253, 253, 0.514);
+	color: var(--on-surface-var);
+	line-height: 1.6;
 }
 
 #sj-address {
-	background: none;
+	background: var(--surface-dim);
 	font-family: inherit;
-	padding: 0px 17px;
-	height: 48px;
-	border: 1px solid rgb(255, 255, 255, 0.2);
-	color: var(--text-color);
-	border-radius: 3px;
+	padding: 0 17px;
+	height: 44px;
+	border: 1px solid var(--outline-var);
+	color: var(--on-surface);
+	border-radius: 24px;
 	outline: none;
 	width: 350px;
 	margin-top: 5px;
-	border-radius: 50px;
-	color: #fff;
-	transition: border-radius 0.1s;
+	transition: all 0.15s;
 }
 
 #sj-address:focus {
-	border: 1px solid rgba(253, 253, 253, 0.514);
-	border-radius: 6px;
+	border: 1px solid var(--accent);
+	border-radius: 16px;
 }
 
 .credit {
-	border-radius: 10px;
-	padding: 10px;
-	display: block;
-	border: #fff 1px solid;
-	color: #fff;
+	border-radius: 14px;
+	padding: 14px;
 	display: flex;
 	flex-wrap: wrap;
 	margin-bottom: 15px;
+	border: 1px solid var(--outline-var);
+	background: var(--surface);
+	color: var(--on-surface);
 }
 
 .credit label {
@@ -135,9 +139,11 @@ footer a:hover {
 
 .credit a,
 .credit label {
-	color: white;
+	color: var(--accent);
 	text-decoration: underline;
 	text-align: right;
+	font-weight: 600;
+	font-size: 13px;
 }
 
 .credit pre {
