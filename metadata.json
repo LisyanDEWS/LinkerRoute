@@ -1,0 +1,6 @@
+{
+  "name": "LinkerRoute",
+  "description": "The web proxy and monitoring application powered by Scramjet and Fastify.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

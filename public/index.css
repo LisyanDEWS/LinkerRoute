@@ -1,0 +1,175 @@
+/* index.css — shared styles for error/credits pages.
+   Colors use M3 CSS variables set by theme.js. */
+
+body {
+	font-family: 'Inter', system-ui, -apple-system, sans-serif;
+	margin: 0;
+	background: var(--bg);
+	color: var(--on-surface);
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+}
+
+.flex-center {
+	display: flex;
+	justify-content: center;
+}
+
+.header-center {
+	align-items: center;
+	flex-direction: column;
+	margin-top: 10%;
+}
+
+.left-margin {
+	margin: 0 16px;
+}
+
+#sj-frame {
+	border: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background: var(--bg);
+}
+
+#sj-error {
+	color: #ef4444 !important;
+	white-space: pre-wrap;
+}
+
+#sj-error-code {
+	font-size: 12px;
+	color: var(--on-surface-var);
+	font-family: 'Courier New', Courier, monospace;
+}
+
+.logo {
+	height: 25vh;
+}
+
+.logo-wrapper .text {
+	font-size: 64px;
+	font-weight: 900;
+	letter-spacing: -0.03em;
+	color: var(--on-surface);
+}
+
+.logo-wrapper h1 {
+	color: var(--on-surface);
+}
+
+footer {
+	margin: 0 16px;
+	margin-top: auto;
+	display: flex;
+	flex-direction: column;
+	line-height: 30px;
+	margin-bottom: 20px;
+}
+
+footer > div {
+	display: flex;
+	justify-content: left;
+	align-items: center;
+	flex-wrap: wrap;
+	margin-bottom: 15px;
+}
+
+footer a,
+footer span {
+	margin: 0 15px;
+	text-decoration: none;
+	color: var(--on-surface-var);
+	font-size: 14px;
+	font-weight: 500;
+}
+
+footer a {
+	cursor: pointer;
+}
+
+footer a:hover {
+	color: var(--accent);
+}
+
+.desc p {
+	width: 560px;
+	color: var(--on-surface-var);
+	line-height: 1.6;
+}
+
+#sj-address {
+	background: var(--surface-dim);
+	font-family: inherit;
+	padding: 0 20px;
+	height: 46px;
+	border: 1.5px solid var(--outline-var);
+	color: var(--on-surface);
+	border-radius: 9999px;
+	outline: none;
+	width: 360px;
+	margin-top: 5px;
+	transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+
+#sj-address:focus {
+	border-color: var(--accent);
+	background: var(--surface);
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+	border-radius: 9999px;
+}
+
+.credit {
+	border-radius: 24px;
+	padding: 18px 20px;
+	display: flex;
+	flex-wrap: wrap;
+	margin-bottom: 16px;
+	border: 1px solid var(--outline-var);
+	background: var(--surface);
+	color: var(--on-surface);
+	box-shadow: var(--shadow-1);
+	transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.credit:hover {
+	border-color: var(--outline);
+	transform: translateY(-2px);
+	box-shadow: var(--shadow-2);
+}
+
+.credit label {
+	margin-left: auto;
+	margin-right: 15px;
+}
+
+.credit a,
+.credit label {
+	color: var(--accent);
+	text-decoration: underline;
+	text-align: right;
+	font-weight: 600;
+	font-size: 13px;
+}
+
+.credit pre {
+	display: none;
+	width: 100%;
+}
+
+.credit label::after {
+	content: "show license";
+	cursor: pointer;
+}
+
+.credit input:checked + label::after {
+	content: "hide license";
+}
+
+.credit input:checked ~ pre {
+	display: block;
+}
