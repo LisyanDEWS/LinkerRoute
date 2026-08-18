@@ -7,6 +7,7 @@ declare global {
 
 let scramjetInstance: any = null;
 let bareMuxConn: any = null;
+let bareMuxFailed = false;
 
 export function searchUrl(input: string, template = "https://duckduckgo.com/?q=%s"): string {
   if (!input) return "";
@@ -76,24 +77,45 @@ export function cleanScramjetUrl(rawUrl: string): string {
   return cleanUrl;
 }
 
+async function assetExists(path: string): Promise<boolean> {
+  try {
+    const res = await fetch(path, { method: 'HEAD' });
+    return res.ok;
+  } catch (e) {
+    try {
+      // Some servers block HEAD; try GET but don't download full body
+      const res2 = await fetch(path, { method: 'GET' });
+      return res2.ok;
+    } catch (e2) {
+      return false;
+    }
+  }
+}
+
+function wait(ms: number) {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
 export async function initProxyEngine(): Promise<any> {
-  if (scramjetInstance) return scramjetInstance;
+  if (scramjetInstance || bareMuxFailed) return scramjetInstance;
 
   try {
     if ('serviceWorker' in navigator) {
-      await navigator.serviceWorker.register('/sw.js', { scope: '/' });
-      console.log('[LinkerRoute] SW registered');
+      try {
+        await navigator.serviceWorker.register('/sw.js', { scope: '/' });
+        console.log('[LinkerRoute] SW registered');
+      } catch (swErr) {
+        console.warn('[LinkerRoute] SW registration failed:', swErr);
+      }
     }
 
-    // Defensive checks for scramjet loader and controller
-    if (typeof window.$scramjetLoadController !== 'undefined' && window.$scramjetLoadController) {
+    // Scramjet: only attempt if assets are present
+    const scramOk = await assetExists('/scram/scramjet.all.js');
+    if (window.$scramjetLoadController && scramOk) {
       try {
-        // The loader might be a function or an object. Support both.
         const loaderResult = (typeof window.$scramjetLoadController === 'function')
           ? window.$scramjetLoadController()
           : window.$scramjetLoadController;
-
-        // loaderResult may be a Promise (async loader). Await if needed.
         const resolved = loaderResult instanceof Promise ? await loaderResult : loaderResult;
 
         if (resolved && resolved.ScramjetController) {
@@ -109,12 +131,10 @@ export async function initProxyEngine(): Promise<any> {
             });
 
             if (typeof scramjetInstance.init === 'function') {
-              // Protect the init call so library internal failures don't crash the app
               try {
                 await scramjetInstance.init();
               } catch (initErr) {
                 console.error('[LinkerRoute] scramjetInstance.init() failed:', initErr);
-                // fallback to null so the rest of the proxy continues working
                 scramjetInstance = null;
               }
             } else {
@@ -131,26 +151,49 @@ export async function initProxyEngine(): Promise<any> {
       } catch (loaderErr) {
         console.error('[LinkerRoute] Error while invoking $scramjetLoadController():', loaderErr);
       }
+    } else if (!scramOk) {
+      console.info('[LinkerRoute] scram assets not found at /scram/, skipping scramjet init');
     } else {
       console.info('[LinkerRoute] $scramjetLoadController not available in this environment');
     }
 
-    if (window.BareMux) {
-      try {
-        bareMuxConn = new window.BareMux.BareMuxConnection("/baremux/worker.js");
-        const wispUrl = (location.protocol === "https:" ? "wss" : "ws") + "://" + location.host + "/wisp/";
-        await bareMuxConn.setTransport("/libcurl/index.mjs", [{ wisp: wispUrl }]);
-        console.log('[LinkerRoute] BareMux transport initialized');
-      } catch (bmErr) {
-        console.error('[LinkerRoute] BareMux initialization failed:', bmErr);
-        bareMuxConn = null;
+    // BareMux: preflight assets and attempt with retries
+    const baremuxWorkerOk = await assetExists('/baremux/worker.js');
+    const libcurlOk = await assetExists('/libcurl/index.mjs');
+
+    if (window.BareMux && baremuxWorkerOk && libcurlOk) {
+      const maxAttempts = 3;
+      let attempt = 0;
+      let initialized = false;
+      while (attempt < maxAttempts && !initialized) {
+        attempt++;
+        try {
+          bareMuxConn = new window.BareMux.BareMuxConnection('/baremux/worker.js');
+          const wispUrl = (location.protocol === 'https:' ? 'wss' : 'ws') + '://' + location.host + '/wisp/';
+          await bareMuxConn.setTransport('/libcurl/index.mjs', [{ wisp: wispUrl }]);
+          console.log('[LinkerRoute] BareMux transport initialized');
+          initialized = true;
+        } catch (bmErr) {
+          console.warn(`[LinkerRoute] BareMux initialization attempt ${attempt} failed:`, bmErr);
+          if (attempt < maxAttempts) await wait(500 * attempt);
+        }
       }
+      if (!initialized) {
+        console.error('[LinkerRoute] BareMux failed to initialize after attempts, falling back to server proxy');
+        bareMuxConn = null;
+        bareMuxFailed = true;
+      }
+    } else {
+      if (!baremuxWorkerOk || !libcurlOk) console.info('[LinkerRoute] BareMux assets missing, skipping BareMux init');
+      if (!window.BareMux) console.info('[LinkerRoute] BareMux not present in window');
+      bareMuxFailed = true;
     }
 
     return scramjetInstance;
   } catch (err) {
     console.error("[LinkerRoute] Proxy init error:", err);
-    return null;
+    bareMuxFailed = true;
+    return scramjetInstance;
   }
 }
 
@@ -172,11 +215,11 @@ export async function clearAllBrowsingData(): Promise<string[]> {
 
   // 2. Clear IndexedDB databases
   try {
-    if (indexedDB.databases) {
-      const dbs = await indexedDB.databases();
-      await Promise.all(dbs.map(db => {
+    if ((indexedDB as any).databases) {
+      const dbs = await (indexedDB as any).databases();
+      await Promise.all(dbs.map((db: any) => {
         if (db.name) return new Promise(resolve => {
-          const req = indexedDB.deleteDatabase(db.name!);
+          const req = indexedDB.deleteDatabase(db.name);
           req.onsuccess = resolve;
           req.onerror = resolve;
           req.onblocked = resolve;
