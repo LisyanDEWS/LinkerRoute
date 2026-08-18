@@ -93,9 +93,9 @@ fastify.register(fastifyStatic, {
 // Simple server-side proxy to fetch remote HTML and strip frame-blocking headers.
 // This helps the client fallback iframe display sites that set X-Frame-Options or CSP frame-ancestors.
 fastify.get('/proxy/raw', async (request, reply) => {
-	const urlParam = (request.query && (request.query as any).url) || '';
+	const urlParam = (request.query && request.query.url) || '';
 	if (!urlParam) return reply.code(400).send('Missing url parameter');
-	let targetUrl: URL;
+	let targetUrl;
 	try {
 		targetUrl = new URL(urlParam);
 	} catch (e) {
@@ -112,7 +112,7 @@ fastify.get('/proxy/raw', async (request, reply) => {
 		clearTimeout(timeout);
 
 		// Clone response headers but remove frame-blocking and CSP headers
-		const headers = {} as Record<string,string>;
+		const headers = {};
 		res.headers.forEach((v, k) => {
 			const kl = k.toLowerCase();
 			if (kl === 'x-frame-options' || kl === 'content-security-policy' || kl === 'content-security-policy-report-only' || kl === 'x-content-security-policy') {
@@ -123,7 +123,7 @@ fastify.get('/proxy/raw', async (request, reply) => {
 		});
 
 		const contentType = res.headers.get('content-type') || '';
-		let body: Buffer | string = await res.arrayBuffer().then(a => Buffer.from(a));
+		let body = await res.arrayBuffer().then(a => Buffer.from(a));
 
 		if (contentType.includes('text/html')) {
 			// Insert or replace <base> tag so relative URLs resolve to the original site
@@ -147,7 +147,7 @@ fastify.get('/proxy/raw', async (request, reply) => {
 		reply.header('cache-control', 'no-store');
 		return reply.code(res.status).send(body);
 	} catch (err) {
-		if ((err as any).name === 'AbortError') return reply.code(504).send('Upstream fetch timeout');
+		if (err && err.name === 'AbortError') return reply.code(504).send('Upstream fetch timeout');
 		return reply.code(502).send('Bad upstream fetch');
 	}
 });
@@ -243,7 +243,7 @@ fastify.post("/api/stop", async (request, reply) => {
 
 // Proxy route: serves index.html and auto-loads the URL
 fastify.get("/proxy/*", (request, reply) => {
-	const url = (request.params as any)["*"];
+	const url = request.params && request.params['*'];
 	return reply.sendFile("index.html");
 });
 
