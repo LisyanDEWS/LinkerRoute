@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkerRoute</title>
+
+    <!-- COEP/COOP are set via server headers, but these meta tags ensure
+         the page is cross-origin-isolated before any JS runs -->
+    <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin">
+    <meta http-equiv="Cross-Origin-Embedder-Policy" content="require-corp">
+
+    <!-- Theme bridge: applies M3 CSS variables from parent postMessage or storage -->
+    <script src="/theme.js"></script>
+
+    <!-- Scramjet proxy engine & transports -->
+    <script src="/scram/scramjet.all.js"></script>
+    <script src="/baremux/index.js"></script>
+
+    <!-- Compiled Local Tailwind CSS (No external CDN, 100% compliant with COEP/COOP) -->
+    <link rel="stylesheet" href="/app.css">
+</head>
+<body>
+    <div id="root"></div>
+    <script type="module" src="/app.bundle.js"></script>
+</body>
+</html>
