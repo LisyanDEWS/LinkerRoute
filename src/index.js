@@ -27,7 +27,7 @@ const fastify = Fastify({
 				// Only set COOP/COEP on secure or localhost origins to avoid browser warnings on insecure origins
 				const hostHeader = req.headers.host || "";
 				const isLocal = hostHeader.startsWith("localhost") || hostHeader.startsWith("127.0.0.1");
-				const isEncrypted = Boolean((req.socket as any).encrypted);
+				const isEncrypted = Boolean(req.socket.encrypted);
 				if (isEncrypted || isLocal || req.headers["x-forwarded-proto"] === "https") {
 					res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
 					res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
