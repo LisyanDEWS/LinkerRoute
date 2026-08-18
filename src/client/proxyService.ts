@@ -85,24 +85,66 @@ export async function initProxyEngine(): Promise<any> {
       console.log('[LinkerRoute] SW registered');
     }
 
-    if (window.$scramjetLoadController) {
-      const { ScramjetController } = window.$scramjetLoadController();
-      scramjetInstance = new ScramjetController({
-        prefix: '/scramjet/',
-        files: {
-          wasm: "/scram/scramjet.wasm.wasm",
-          all: "/scram/scramjet.all.js",
-          sync: "/scram/scramjet.sync.js",
+    // Defensive checks for scramjet loader and controller
+    if (typeof window.$scramjetLoadController !== 'undefined' && window.$scramjetLoadController) {
+      try {
+        // The loader might be a function or an object. Support both.
+        const loaderResult = (typeof window.$scramjetLoadController === 'function')
+          ? window.$scramjetLoadController()
+          : window.$scramjetLoadController;
+
+        // loaderResult may be a Promise (async loader). Await if needed.
+        const resolved = loaderResult instanceof Promise ? await loaderResult : loaderResult;
+
+        if (resolved && resolved.ScramjetController) {
+          const { ScramjetController } = resolved;
+          try {
+            scramjetInstance = new ScramjetController({
+              prefix: '/scramjet/',
+              files: {
+                wasm: "/scram/scramjet.wasm.wasm",
+                all: "/scram/scramjet.all.js",
+                sync: "/scram/scramjet.sync.js",
+              }
+            });
+
+            if (typeof scramjetInstance.init === 'function') {
+              // Protect the init call so library internal failures don't crash the app
+              try {
+                await scramjetInstance.init();
+              } catch (initErr) {
+                console.error('[LinkerRoute] scramjetInstance.init() failed:', initErr);
+                // fallback to null so the rest of the proxy continues working
+                scramjetInstance = null;
+              }
+            } else {
+              console.warn('[LinkerRoute] ScramjetController exists but has no init() method');
+              scramjetInstance = null;
+            }
+          } catch (ctorErr) {
+            console.error('[LinkerRoute] constructing ScramjetController failed:', ctorErr);
+            scramjetInstance = null;
+          }
+        } else {
+          console.warn('[LinkerRoute] $scramjetLoadController resolved but did not provide ScramjetController:', resolved);
         }
-      });
-      await scramjetInstance.init();
+      } catch (loaderErr) {
+        console.error('[LinkerRoute] Error while invoking $scramjetLoadController():', loaderErr);
+      }
+    } else {
+      console.info('[LinkerRoute] $scramjetLoadController not available in this environment');
     }
 
     if (window.BareMux) {
-      bareMuxConn = new window.BareMux.BareMuxConnection("/baremux/worker.js");
-      const wispUrl = (location.protocol === "https:" ? "wss" : "ws") + "://" + location.host + "/wisp/";
-      await bareMuxConn.setTransport("/libcurl/index.mjs", [{ wisp: wispUrl }]);
-      console.log('[LinkerRoute] BareMux transport initialized');
+      try {
+        bareMuxConn = new window.BareMux.BareMuxConnection("/baremux/worker.js");
+        const wispUrl = (location.protocol === "https:" ? "wss" : "ws") + "://" + location.host + "/wisp/";
+        await bareMuxConn.setTransport("/libcurl/index.mjs", [{ wisp: wispUrl }]);
+        console.log('[LinkerRoute] BareMux transport initialized');
+      } catch (bmErr) {
+        console.error('[LinkerRoute] BareMux initialization failed:', bmErr);
+        bareMuxConn = null;
+      }
     }
 
     return scramjetInstance;
