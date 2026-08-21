@@ -15,11 +15,30 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,0,0" />
 
-    <!-- Config & Scramjet proxy engine & transports -->
-    <script src="/config.js"></script>
-    <script src="/scram/scramjet.codecs.js"></script>
-    <script src="/scram/scramjet.config.js"></script>
-    <script src="/scram/scramjet.bundle.js"></script>
+    <!-- Polyfill navigator.serviceWorker if running on unsecure LAN origin to prevent BareMux crash -->
+    <script>
+        if (typeof navigator !== 'undefined' && !navigator.serviceWorker) {
+            try {
+                Object.defineProperty(navigator, 'serviceWorker', {
+                    value: {
+                        addEventListener: function() {},
+                        removeEventListener: function() {},
+                        dispatchEvent: function() { return true; },
+                        register: function() {
+                            return Promise.reject(new Error("ServiceWorker requires HTTPS, localhost, or 127.0.0.1"));
+                        },
+                        ready: new Promise(function() {})
+                    },
+                    configurable: true,
+                    writable: true
+                });
+            } catch (e) {
+                console.warn("ServiceWorker polyfill notice:", e);
+            }
+        }
+    </script>
+
+    <!-- Scramjet proxy engine & transports -->
     <script src="/scram/scramjet.all.js"></script>
     <script src="/baremux/index.js"></script>
     <script src="/register-sw.js" defer></script>
@@ -68,6 +87,8 @@
             opacity: 1;
             transition: opacity 0.35s ease;
             pointer-events: auto;
+            padding: 24px;
+            text-align: center;
         }
 
         #loading-overlay:not(.visible) {
@@ -99,6 +120,52 @@
             font-size: 12px;
             font-family: 'JetBrains Mono', monospace;
             color: #71717a;
+            max-width: 500px;
+            word-break: break-word;
+        }
+
+        .warning-card {
+            background: #18181b;
+            border: 1px solid #27272a;
+            border-radius: 12px;
+            padding: 20px;
+            max-width: 520px;
+            text-align: left;
+            margin-top: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+        }
+
+        .warning-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #f59e0b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .warning-text {
+            font-size: 13px;
+            line-height: 1.5;
+            color: #d4d4d8;
+            margin-bottom: 14px;
+        }
+
+        .action-link {
+            display: inline-block;
+            background: #3b82f6;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background 0.15s ease;
+        }
+
+        .action-link:hover {
+            background: #2563eb;
         }
 
         /* ── Discreet Top-Right Reload Helper (Hover Only) ── */
@@ -149,9 +216,10 @@
 
     <!-- Minimalist Loading Overlay -->
     <div id="loading-overlay" class="visible">
-        <div class="m3-spinner"></div>
-        <div class="loading-title">Launching Telegram Web...</div>
-        <div class="loading-detail">web.telegram.org/a/</div>
+        <div id="spinner-container" class="m3-spinner"></div>
+        <div id="loading-title" class="loading-title">Launching Telegram Web...</div>
+        <div id="loading-detail" class="loading-detail">web.telegram.org/a/</div>
+        <div id="untrusted-origin-warning" style="display: none;"></div>
     </div>
 
     <!-- Fullscreen Iframe Viewport -->
