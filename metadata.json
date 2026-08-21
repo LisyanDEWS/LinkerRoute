@@ -1,6 +1,13 @@
 {
-  "name": "LinkerRoute",
-  "description": "The web proxy and monitoring application powered by Scramjet and Fastify.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "name": "Telegram Web Launcher",
+  "description": "Full-screen Telegram Web launcher with server selection and proxy acceleration.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation",
+    "display-capture"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

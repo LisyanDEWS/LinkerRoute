@@ -24,14 +24,8 @@ const fastify = Fastify({
 	serverFactory: (handler) => {
 		return createServer()
 			.on("request", (req, res) => {
-				// Only set COOP/COEP on secure or localhost origins to avoid browser warnings on insecure origins
-				const hostHeader = req.headers.host || "";
-				const isLocal = hostHeader.startsWith("localhost") || hostHeader.startsWith("127.0.0.1");
-				const isEncrypted = Boolean(req.socket.encrypted);
-				if (isEncrypted || isLocal || req.headers["x-forwarded-proto"] === "https") {
-					res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
-					res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
-				}
+				res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
+				res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
 				handler(req, res);
 			})
 			.on("upgrade", (req, socket, head) => {
@@ -88,68 +82,6 @@ fastify.register(fastifyStatic, {
 	root: baremuxPath,
 	prefix: "/baremux/",
 	decorateReply: false,
-});
-
-// Simple server-side proxy to fetch remote HTML and strip frame-blocking headers.
-// This helps the client fallback iframe display sites that set X-Frame-Options or CSP frame-ancestors.
-fastify.get('/proxy/raw', async (request, reply) => {
-	const urlParam = (request.query && request.query.url) || '';
-	if (!urlParam) return reply.code(400).send('Missing url parameter');
-	let targetUrl;
-	try {
-		targetUrl = new URL(urlParam);
-	} catch (e) {
-		return reply.code(400).send('Invalid url');
-	}
-	if (targetUrl.protocol !== 'http:' && targetUrl.protocol !== 'https:') {
-		return reply.code(400).send('Invalid protocol');
-	}
-
-	try {
-		const controller = new AbortController();
-		const timeout = setTimeout(() => controller.abort(), 15000);
-		const res = await fetch(targetUrl.toString(), { signal: controller.signal, redirect: 'follow' });
-		clearTimeout(timeout);
-
-		// Clone response headers but remove frame-blocking and CSP headers
-		const headers = {};
-		res.headers.forEach((v, k) => {
-			const kl = k.toLowerCase();
-			if (kl === 'x-frame-options' || kl === 'content-security-policy' || kl === 'content-security-policy-report-only' || kl === 'x-content-security-policy') {
-				// skip
-			} else {
-				headers[k] = v;
-			}
-		});
-
-		const contentType = res.headers.get('content-type') || '';
-		let body = await res.arrayBuffer().then(a => Buffer.from(a));
-
-		if (contentType.includes('text/html')) {
-			// Insert or replace <base> tag so relative URLs resolve to the original site
-			let text = body.toString('utf8');
-			const baseTag = `<base href="${targetUrl.origin}">`;
-			if (/\<base[^>]*>/i.test(text)) {
-				text = text.replace(/\<base[^>]*>/i, baseTag);
-			} else if (/\<head[^>]*>/i.test(text)) {
-				text = text.replace(/\<head([^>]*)>/i, (m) => `${m}\n    ${baseTag}`);
-			} else {
-				text = baseTag + '\n' + text;
-			}
-			body = text;
-			// ensure content-type header preserved
-			headers['content-type'] = 'text/html; charset=utf-8';
-		}
-
-		// Return the body with filtered headers
-		Object.entries(headers).forEach(([k,v]) => reply.header(k, v));
-		// Prevent caching for proxied content
-		reply.header('cache-control', 'no-store');
-		return reply.code(res.status).send(body);
-	} catch (err) {
-		if (err && err.name === 'AbortError') return reply.code(504).send('Upstream fetch timeout');
-		return reply.code(502).send('Bad upstream fetch');
-	}
 });
 
 // --- NODE CONTROL & MONITORING API ---
@@ -243,7 +175,7 @@ fastify.post("/api/stop", async (request, reply) => {
 
 // Proxy route: serves index.html and auto-loads the URL
 fastify.get("/proxy/*", (request, reply) => {
-	const url = request.params && request.params['*'];
+	const url = request.params["*"];
 	return reply.sendFile("index.html");
 });
 
@@ -275,7 +207,7 @@ function shutdown() {
 	process.exit(0);
 }
 
-let port = parseInt(process.env.PORT || "");
+let port = parseInt(process.env.PORT || "3000");
 
 if (isNaN(port)) port = 3000;
 

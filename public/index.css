@@ -105,41 +105,31 @@ footer a:hover {
 #sj-address {
 	background: var(--surface-dim);
 	font-family: inherit;
-	padding: 0 20px;
-	height: 46px;
-	border: 1.5px solid var(--outline-var);
+	padding: 0 17px;
+	height: 44px;
+	border: 1px solid var(--outline-var);
 	color: var(--on-surface);
-	border-radius: 9999px;
+	border-radius: 24px;
 	outline: none;
-	width: 360px;
+	width: 350px;
 	margin-top: 5px;
-	transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+	transition: all 0.15s;
 }
 
 #sj-address:focus {
-	border-color: var(--accent);
-	background: var(--surface);
-	box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
-	border-radius: 9999px;
+	border: 1px solid var(--accent);
+	border-radius: 16px;
 }
 
 .credit {
-	border-radius: 24px;
-	padding: 18px 20px;
+	border-radius: 14px;
+	padding: 14px;
 	display: flex;
 	flex-wrap: wrap;
-	margin-bottom: 16px;
+	margin-bottom: 15px;
 	border: 1px solid var(--outline-var);
 	background: var(--surface);
 	color: var(--on-surface);
-	box-shadow: var(--shadow-1);
-	transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
-}
-
-.credit:hover {
-	border-color: var(--outline);
-	transform: translateY(-2px);
-	box-shadow: var(--shadow-2);
 }
 
 .credit label {

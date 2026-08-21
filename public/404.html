@@ -16,20 +16,8 @@
 				color: var(--on-surface);
 				display: flex;
 				flex-direction: column;
-				align-items: center;
-				justify-content: center;
 				min-height: 100vh;
 				padding: 32px;
-			}
-			.error-card {
-				background: var(--surface);
-				border: 1px solid var(--outline-var);
-				border-radius: 32px;
-				padding: 40px 36px;
-				max-width: 460px;
-				width: 100%;
-				box-shadow: var(--shadow-2);
-				text-align: center;
 			}
 			.logo-wrapper { margin-bottom: 16px; }
 			.logo-wrapper h1 {
@@ -38,35 +26,19 @@
 				letter-spacing: -0.03em;
 				color: var(--on-surface);
 			}
-			.desc { margin-bottom: 28px; }
+			.desc { margin-bottom: 24px; }
 			.desc p {
 				font-size: 14px;
 				color: var(--on-surface-var);
+				max-width: 480px;
 				line-height: 1.6;
 			}
-			.btn-home {
-				display: inline-flex;
-				align-items: center;
-				justify-content: center;
-				padding: 12px 24px;
-				background: var(--accent);
-				color: var(--on-accent);
-				border-radius: 9999px;
-				text-decoration: none;
-				font-size: 13px;
-				font-weight: 700;
-				transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
-				box-shadow: var(--shadow-1);
-			}
-			.btn-home:hover {
-				transform: translateY(-1px) scale(1.02);
-				box-shadow: var(--shadow-2);
-			}
 			footer {
-				margin-top: 32px;
+				margin-top: auto;
 				display: flex;
-				justify-content: center;
 				gap: 16px;
+				padding-top: 20px;
+				border-top: 1px solid var(--outline-var);
 			}
 			footer a, footer span {
 				font-size: 12px;
@@ -78,18 +50,15 @@
 		</style>
 	</head>
 	<body>
-		<div class="error-card">
-			<div class="logo-wrapper">
-				<h1>LinkerRoute | Error</h1>
-			</div>
-			<div class="desc">
-				<p>The server could not route your request.</p>
-			</div>
-			<a href="/" class="btn-home">Return Home</a>
-			<footer>
-				<a title="License information" href="credits.html">Credits</a>
-				<span>Powered by Scramjet</span>
-			</footer>
+		<div class="logo-wrapper">
+			<h1>LinkerRoute | Error</h1>
 		</div>
+		<div class="desc">
+			<p>The server could not route your request.</p>
+		</div>
+		<footer>
+			<a title="License information" href="credits.html">Credits</a>
+			<span>Powered by Scramjet</span>
+		</footer>
 	</body>
 </html>
