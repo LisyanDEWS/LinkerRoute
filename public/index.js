@@ -28,6 +28,7 @@ async function initProxy() {
         const connection = new BareMux.BareMuxConnection("/baremux/worker.js");
         const protocol = location.protocol === "https:" ? "wss:" : "ws:";
         await connection.setTransport("/libcurl/index.mjs", [{ wisp: `${protocol}//${location.host}/wisp/` }]);
+        await new Promise(resolve => setTimeout(resolve, 1000));
     }
 }
 
