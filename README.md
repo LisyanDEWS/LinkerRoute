@@ -1,36 +1,11 @@
-# Telegram Web Launcher
+# Telegram Web Proxy
 
-Run Telegram Web (Server A) directly in full screen on your local PC.
+Run Telegram Web directly in your browser through a secure proxy.
 
-## Quick Start on Localhost (No Docker Needed)
+## Setup
 
-You only need **Node.js** (version 18 or 20+) installed on your PC.
+1. Install: `npm install`
+2. Start: `npm start`
+3. Open: `http://localhost:3000`
 
-### 1. Install dependencies
-```bash
-npm install
-```
-
-### 2. Start the server
-```bash
-npm start
-```
-
-### 3. Open in your browser
-Navigate to:
-```
-http://localhost:3000
-```
-*(Or `http://127.0.0.1:3000`)*
-
----
-
-### Custom Port (Optional)
-If port 3000 is occupied, run with any port:
-```bash
-PORT=8080 npm start
-```
-Windows (PowerShell):
-```powershell
-$env:PORT="8080"; npm start
-```
+That's it. Just Telegram.

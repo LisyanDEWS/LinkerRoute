@@ -1,6 +1,6 @@
 {
-  "name": "Telegram Web Launcher",
-  "description": "Full-screen Telegram Web launcher with server selection and proxy acceleration.",
+  "name": "Telegram Web Proxy",
+  "description": "Telegram Web Proxy Server",
   "requestFramePermissions": [
     "camera",
     "microphone",
