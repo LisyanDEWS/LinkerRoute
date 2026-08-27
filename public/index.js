@@ -1,4 +1,4 @@
-const SERVER_A_URL = 'https://web.telegram.org/a/';
+const TELEGRAM_URL = 'https://web.telegram.org/k/';
 let scramjetInstance = null;
 let activeFrame = null;
 
@@ -54,7 +54,7 @@ async function launch(retryCount = 0) {
             }
             
             // Soft retry logic: if it fails, we try calling .go() again without full page reload
-            activeFrame.go(SERVER_A_URL);
+            activeFrame.go(TELEGRAM_URL);
         }
         
         loading.classList.add('hidden');
