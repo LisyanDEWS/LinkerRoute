@@ -1,4 +1,4 @@
-const TELEGRAM_URL = 'https://web.telegram.org/k/';
+const TELEGRAM_URL = 'https://web.telegram.org/a/';
 let scramjetInstance = null;
 let activeFrame = null;
 
@@ -64,7 +64,7 @@ async function launch(retryCount = 0) {
             console.log(`Retrying softly... (${retryCount + 1}/3)`);
             setTimeout(() => launch(retryCount + 1), 1500);
         } else {
-            loading.innerHTML = `<div style="text-align:center">Connection Failed.<br><button onclick="location.reload()" style="margin-top:10px;padding:8px 16px;background:#333;color:#fff;border:none;border-radius:4px;cursor:pointer">Reload Page</button></div>`;
+            loading.innerHTML = `<div style="text-align:center">Connection Failed.<br><button onclick="location.reload()" style="margin-top:10px;padding:8px 16px;background:#333;color:#fff;border:none[...]
         }
     }
 }
