@@ -28,7 +28,7 @@ USER node
 EXPOSE 8080
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-	CMD-SHELL wget -q -O /dev/null "http://127.0.0.1:${PORT:-8080}/health" || exit 1
+	CMD wget -q -O /dev/null "http://127.0.0.1:${PORT:-8080}/health" || exit 1
 
 STOPSIGNAL SIGTERM
 CMD ["node", "src/index.js"]
