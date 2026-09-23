@@ -1,7 +1,7 @@
 {
-	"name": "Scramjet Demo",
-	"description": "Scramjet Demo App",
-	"repository": "https://github.com/.../Scramjet-Demo",
+	"name": "LinkerRoute",
+	"description": "Production Telegram Web proxy server",
+	"repository": "https://github.com/LisyanDEWS/LinkerRoute",
 	"logo": "https://raw.githubusercontent.com/MercuryWorkshop/scramjet/main/assets/scramjet.png",
-	"keywords": ["scramjet"]
+	"keywords": ["telegram", "proxy", "scramjet", "railway"]
 }

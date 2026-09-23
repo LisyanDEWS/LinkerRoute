@@ -1,3 +1,7 @@
 node_modules
 .DS_Store
 scramjet/
+.env
+.env.*
+!.env.example
+npm-debug.log*
